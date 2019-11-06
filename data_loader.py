@@ -9,7 +9,7 @@ import pandas as pd
 
 
 class LoadDataset(Dataset):
-    def __init__(self, ds_path, mode, esc10_ony=False):
+    def __init__(self, ds_path, mode, esc10_only=False):
         meta_path = os.path.join(ds_path, "meta", "esc50.csv")
         if mode == "train":
             fold = ["1", "2", "3", "4"]
@@ -19,12 +19,12 @@ class LoadDataset(Dataset):
             raise ValueError('Incorrect mode, must be train or test')
         df = pd.read_csv(meta_path)
         df = df[df["fold"].isin(fold)]
-        if esc10_ony:
+        if esc10_only:
             df = df[df["esc10"] == True]
-
+            d = dict(zip(df["target"].unique(), range(10)))
+            df['target'] = df['target'].map(lambda x: d[x])
         self.files = [os.path.join(ds_path, "audio", x) for x in df["filename"]]
         self.targets = [x for x in df["target"]]
-
 
     def __getitem__(self, index):
         im, lb = self.pull_item(index)

@@ -2,6 +2,7 @@ import math
 import torch
 from torch import nn
 import torch.nn.functional as F
+import copy
 
 class Wavelet(nn.Module):
     """Class for computing learnable stationary wavelet transform
@@ -31,7 +32,7 @@ class Wavelet(nn.Module):
         nn.init.xavier_uniform_(hi)
         hi = hi - hi.mean()
         self.hi = nn.Parameter(hi / torch.sqrt(self.energy(hi)))
-        lo = self.reverse(hi)
+        lo = copy.deepcopy(self.reverse(hi))
         odd = torch.arange(1, lo.size(2) - 1, 2).long()
         lo[:, :, odd] = lo[:, :, odd] * -1
         self.lo = nn.Parameter(lo)
